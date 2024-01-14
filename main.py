@@ -12,7 +12,7 @@ title_label = tk.Label(root, text="Character Background Generator", font=("Arial
 title_label.pack(pady=20)
 
 # Create the input labels and text boxes
-name_label = tk.Label(root, text="Names:")
+name_label = tk.Label(root, text="Name:")
 name_label.pack()
 name_entry = tk.Entry(root)
 name_entry.pack()
@@ -58,7 +58,7 @@ location_entry = tk.Entry(root)
 location_entry.pack()
 
 # Create a function to save the values
-def save_values():
+def save_values0():
     global Name, Age, LifeStyle, Race, Personality, Background, Gender, Location
 
     Name = name_entry.get()
@@ -113,14 +113,78 @@ def save_values():
 
     second_window = tk.Toplevel(root)
     second_window.title("Generated Character Background")
-    second_window.geometry("1200x800")
+    second_window.geometry("1400x1000")
 
     character_background_label = tk.Label(second_window, text=background_response, font=("Arial", 16), wraplength=root.winfo_width())
     character_background_label.pack(pady=20, fill=tk.BOTH, expand=True)
 
+# Create a function to save the values
+def save_values1():
+    global Name, Age, LifeStyle, Race, Personality, Background, Gender, Location
+
+    Name = name_entry.get()
+    Age = age_entry.get()
+    LifeStyle = lifestyle_entry.get()
+    Race = race_entry.get()
+    Class = class_entry.get()
+    Personality = personality_entry.get()
+    Background = background_entry.get()
+    Gender = gender_entry.get()
+    Location = location_entry.get()
+
+    genai.configure(api_key="AIzaSyCAH-mevjvRmPhwg-a1v0EdwfabNNVYBjo")
+
+    # Set up the model
+    generation_config = {
+    "temperature": 1,
+    "top_p": 0,
+    "top_k": 1,
+    "max_output_tokens": 2048,
+    }
+
+    safety_settings = [
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_ONLY_HIGH"
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_ONLY_HIGH"
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_ONLY_HIGH"
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_ONLY_HIGH"
+    },
+    ]
+
+    model = genai.GenerativeModel(model_name="gemini-pro",
+                                generation_config=generation_config,
+                                safety_settings=safety_settings)
+
+    prompt_parts = [
+    f"Make a story for a DND character whos name is {Name} and whos age is {Age} and whos gender is {Gender} and whos race is Human and whos class is {Class} and whos lifestyle is {LifeStyle} and whos background is {Background} and whos personality is {Personality} and whos location is {Location}. They start without have anything yet and have simply started their journey. As the story develops, add a climax and everything else too. Make it not a cliche\n",
+    ]
+
+    response = model.generate_content(prompt_parts)
+    background_response = response.text
+
+    second_window = tk.Toplevel(root)
+    second_window.title("Generated Character Background")
+    second_window.geometry("1400x1000")
+
+    character_background_label = tk.Label(second_window, text=background_response, font=("Arial", 12), wraplength=root.winfo_width())
+    character_background_label.pack(pady=20, fill=tk.BOTH, expand=True)
+
 # Create a save button
-save_button = tk.Button(root, text="Save", command=save_values)
-save_button.pack(pady=20)
+background_button = tk.Button(root, text="Generate Background", command=save_values0)
+background_button.pack(pady=20)
+
+story_button = tk.Button(root, text="Generate Complete Story", command=save_values1)
+story_button.pack(pady=20)
 
 # Start the main loop
 root.mainloop()
